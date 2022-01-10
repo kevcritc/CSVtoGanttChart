@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jul 27 11:06:16 2021
+
+@author: phykc
+"""
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 import pandas as pd
@@ -5,7 +12,7 @@ import pandas as pd
 #Create a class that hold the data for the gantt chart in pandas
 class Gantt:
     """Process a simple Gantt chart from .csv file using the Matplotlib module developed from https://www.geeksforgeeks.org/python-basic-gantt-chart-using-matplotlib/ """
-    def __init__(self,filename,total_months=42, height=8, gap=1, timeunit='Months', WP=True):
+    def __init__(self,filename,total_months=42, height=8, gap=1, timeunit='Month', WP=True):
         def definetasklist(self):
             tasklist=[]
             #Read the file into the df - the csv file example is the template required
@@ -16,7 +23,9 @@ class Gantt:
             
             # Set up the colours to be used allows 50 personnel but only 10 colors
             colors=['tab:blue','tab:orange','tab:green','tab:red','tab:purple','tab:brown','tab:pink','tab:gray', 'tab:olive', 'tab:cyan']*10
-         
+            people=df['Personnel'].tolist()
+            people = list(dict.fromkeys(people))
+            
             #Loops through the dataframe
             for n in df.index:
                 if checkdf.loc[n,'Task']==False:
@@ -32,13 +41,13 @@ class Gantt:
                         else:
                             sslist.append(tuple([df.iloc[n,5+a], df.iloc[n,6+a]]))
                             a+=2
-                    #Determine the colour by staff
-                    staffindex=int(df.loc[n,'Personnel'])-1
+                    #Determine the personnel
+                    staffindex=people.index(df.loc[n,'Personnel'])
                     #Creates a formatted list to be passed through the plot
                     if WP==True:
-                        tasklist.append([df.loc[n,'Task']+ ' [WP'+str(int(df.loc[n,'WP']))+']',sslist,colors[staffindex]]) 
+                        tasklist.append([df.loc[n,'Task']+ ' [WP'+str(int(df.loc[n,'WP']))+']',sslist,colors[staffindex],df.loc[n,'Personnel']]) 
                     else:
-                        tasklist.append([df.loc[n,'Task'],sslist,colors[staffindex]]) 
+                        tasklist.append([df.loc[n,'Task'],sslist,colors[staffindex],df.loc[n,'Personnel']]) 
                     
             return tasklist
         self.filename=filename
@@ -49,7 +58,7 @@ class Gantt:
         self.timeunit=timeunit
         self.WP=WP
 
-    def plot(self, figure_size=[10,5], gridlines=True, save=True, savename="ganttchart.png", frequency=3,fontsize=12, axisfont=16, wraplen=40, wrap=True):
+    def plot(self, figure_size=[10,5], gridlines=True, save=True, savename="ganttchart.png", frequency=3,fontsize=12, axisfont=16, wraplen=40, wrap=True, legend=True, loc=1):
         self.figure_size=figure_size
         self.gridlines=gridlines
         self.save=save
@@ -59,6 +68,8 @@ class Gantt:
         self.wraplen=wraplen
         self.wrap=wrap
         self.frequency=frequency
+        self.legend=legend
+        self.loc=loc
         plt.rcParams.update({'font.size': self.axisfont})
         # Declaring a figure "gnt"
         fig, gnt = plt.subplots()
@@ -111,17 +122,23 @@ class Gantt:
          
         for i,task in enumerate(self.tasklist):    
         # Declaring a bar in schedule
-            gnt.broken_barh(task[1], ((i+1)*(self.height+self.gap), self.height), facecolors =task[2])
-    
+            gnt.broken_barh(task[1], ((i+1)*(self.height+self.gap), self.height), facecolors =task[2], label=task[3])
+        
         fig.set_size_inches(self.figure_size[0], self.figure_size[1])
+        
+        #A neat method to return the legend without repeating
+        handles, labels = plt.gca().get_legend_handles_labels()
+        by_label = dict(zip(labels, handles))
+        if legend==True:
+            plt.legend(by_label.values(), by_label.keys(), loc=self.loc, fontsize=12)
+        plt.show()
         if save==True:
             plt.savefig(self.savename)
-        plt.show()
         plt.close()
     
 if __name__ == "__main__":   
     filename='tasklist.csv'
     #WP represents Work Packages and should be numberical 1,2,3 etc.
-    gantt=Gantt(filename, gap=5, height=36, WP=True)
+    gantt=Gantt(filename, gap=5, height=42, WP=True)
     # The first argument is figure size in inches 
     gantt.plot([17/2.5,20/2.5],wraplen=45, wrap=True, frequency=6)

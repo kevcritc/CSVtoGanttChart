@@ -16,7 +16,7 @@ class Gantt:
         def definetasklist(self):
             tasklist=[]
             #Read the file into the df - the csv file example is the template required
-            df=pd.read_csv(self.filename)
+            df=pd.read_csv(self.filename,dtype={'Task': 'str','WP': 'str'})
             #Create a dataframe to test the boundaries of the data, allows skipped task lines
             checkdf=df.isnull()
             tasks=df['Task']
@@ -45,7 +45,7 @@ class Gantt:
                     staffindex=people.index(df.loc[n,'Personnel'])
                     #Creates a formatted list to be passed through the plot
                     if WP==True:
-                        tasklist.append([df.loc[n,'Task']+ ' [WP'+str(int(df.loc[n,'WP']))+']',sslist,colors[staffindex],df.loc[n,'Personnel']]) 
+                        tasklist.append([df.loc[n,'Task']+ ' [WP'+str((df.loc[n,'WP']))+']',sslist,colors[staffindex],df.loc[n,'Personnel']]) 
                     else:
                         tasklist.append([df.loc[n,'Task'],sslist,colors[staffindex],df.loc[n,'Personnel']]) 
                     

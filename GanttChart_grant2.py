@@ -10,23 +10,22 @@ import matplotlib.pyplot as plt
 from matplotlib import ticker
 import pandas as pd
 
+#Create a class that hold the data for the gantt chart in pandas
 class Gantt:
     """Process a simple Gantt chart from .csv file using the Matplotlib module developed from https://www.geeksforgeeks.org/python-basic-gantt-chart-using-matplotlib/ """
     def __init__(self,filename,total_months=42, height=8, gap=1, timeunit='Months', WP=True):
         def definetasklist(self):
             tasklist=[]
+            #Read the file into the df - the csv file example is the template required
             df=pd.read_csv(self.filename)
+            #Create a dataframe to test the boundaries of the data, allows skipped task lines
             checkdf=df.isnull()
-            
             tasks=df['Task']
             
-            # Set up the colours to be used allows 10 personal
-            colors=['tab:blue','tab:orange','tab:green','tab:red','tab:purple','tab:brown','tab:pink','tab:gray', 'tab:olive', 'tab:cyan']
-            # Determine the number of tasks int he list
-            # number=len(tasks)
+            # Set up the colours to be used allows 50 personnel but only 10 colors
+            colors=['tab:blue','tab:orange','tab:green','tab:red','tab:purple','tab:brown','tab:pink','tab:gray', 'tab:olive', 'tab:cyan']*10
+         
             #Loops through the dataframe
-            indexlist=df.index.tolist()
-           
             for n in df.index:
                 if checkdf.loc[n,'Task']==False:
                     # Initalises a list of tuples for start and length of time
@@ -34,7 +33,7 @@ class Gantt:
                     sslist=[tuple([df.loc[n,'Start'],df.loc[n,'Length']])]
                     cell_test=False
                     # Looks for addional start times for a task e.g. a break in the task the column positions must be the same.
-                    # A missing start will fail skip the other items in that task
+                    # A missing 'start' will cause an error
                     while cell_test==False:
                         if checkdf.iloc[n,5+a]==True:
                             cell_test=True
@@ -129,6 +128,7 @@ class Gantt:
     
 if __name__ == "__main__":   
     filename='tasklist.csv'
-    
+    #WP represents Work Packages and should be numberical 1,2,3 etc.
     gantt=Gantt(filename, gap=5, height=36, WP=True)
+    # The first argument is figure size in inches 
     gantt.plot([17/2.5,20/2.5],wraplen=45, wrap=True)

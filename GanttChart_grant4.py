@@ -254,7 +254,7 @@ class Gantt:
             
     
 if __name__ == "__main__":   
-    filename='tasklist1.xlsx'
+    filename='tasklist1exaample.xlsx'
     #WP represents Work Packages and should be numberical 1,2,3 etc.
     gantt=Gantt(filename,total_months=42, height=120, gap=25, timeunit='Month', WP=True, FS=True)
     # The first argument is figure size in inches 
